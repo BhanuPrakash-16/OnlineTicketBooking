@@ -1,0 +1,346 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+.eventpageheader {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 97%; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 25px;
+    background:transparent;
+    color: white;
+    z-index: 100;
+    transition: background 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
+}
+.eventlogo{
+    color: white;
+    text-decoration: none;
+}
+.blur-header {
+    background: transparent;
+    backdrop-filter: blur(10px);
+
+}
+.eventpagesearchbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 5px 15px;
+    transition: 0.3s;
+}
+
+.eventpageheaderlist a,
+.eventpageheader-right a {
+    text-decoration: none;
+    color: white !important;
+    font-weight: 400;
+}
+
+.eventpageheader-left,
+.eventpageheaderlist,
+.eventpageheader-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+.eventpageheader-right button{
+    height: 45px;
+    width: 100px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    background: white;
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    border: none;
+}
+.eventpagesearchbox input {
+    height: 36px;
+    width: 220px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    padding-left: 10px;
+}
+
+.eventpagesearchbox:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.eventpageLogin button{
+    background: white;
+    color: black;
+    border: 2px solid white;
+    height: 45px;
+    width: 100px;
+    border-radius: 50px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+.eventsearch-icon {
+    color: white;
+}
+
+.eventimageposter {
+    position: relative;
+    width: 100%;
+    height: 650px;
+    
+}
+
+.eventimageposter img{
+    width: 100%;
+    height: 650px;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.eventoverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), #161617);
+}
+.eventdetailcontainer {
+    background: #161617;
+}
+
+.eventdetailimageposter img {
+    height: 400px;
+    width: 100%;
+    border-radius: 15px;
+}
+
+.moviedetailsdiscription {
+    position: absolute;
+    top: 18%;
+    left: 5%;
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+    color: white;
+    padding: 20px 60px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px); 
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 20px; 
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    padding: 20px;
+    color: white;
+}
+
+.booknowbtn-detailspage {
+    height: 45px;
+    width: 140px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    background: white;
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    border: none;
+}
+
+.booknowbtn-detailspage:hover {
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+}
+
+.casttitle, .crewtitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 50px;
+    padding-bottom: 50px;
+    height: 50px;
+    color: white;
+    font-family: "Anton", sans-serif;
+    font-size: larger;
+}
+.crewtitle{
+    padding: 50px;
+}
+.casttitle button, .crewtitle button {
+    height: 45px;
+    width: 140px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    background: transparent;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    border: 1px solid white;
+}
+
+.casttitle button:hover, .crewtitle button:hover {
+    color: black;
+    background: white;
+}
+
+.cast-scroll-container, .crew-scroll-container, .eventmovie-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    position: relative;
+}
+
+/* Hide scrollbar for WebKit browsers */
+.cast-scroll-container::-webkit-scrollbar,
+.crew-scroll-container::-webkit-scrollbar,
+.eventmovie-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.cast-scroll, .crew-scroll {
+    display: flex;
+    padding: 0px 50px;
+    gap: 2rem;
+}
+
+.castimagecontainer img, .crewimagecontainer img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+}
+
+.castimagecontainer p, .crewimagecontainer p {
+    text-align: center;
+    color: white;
+    margin: 0;
+    font-family: "Anton", sans-serif;
+    font-size: larger;
+}
+
+.eventmoviecontainer {
+    padding: 50px 60px;
+}
+
+.eventmovietitlecontainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    height: 50px;
+    color: white;
+}
+
+.eventmovietitlecontainer button {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    height: 45px;
+    width: 140px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.eventmovietitlecontainer button:hover {
+    color: black;
+    background-color: white;
+}
+
+.eventmovie-scroll {
+    display: flex;
+    gap: 1rem;
+}
+
+.eventmovieimagecontainer {
+    width: 270px;
+    height: 400px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+}
+
+.eventmovieimagecontainer img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.event-details {
+    text-align: center;
+  }
+  
+  .event-details img {
+    max-width: 300px;
+    border-radius: 10px;
+  }
+  .loading-skeleton {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  .joinwithus{
+    height: 75px;
+    width: 100%;
+    color: #000;
+    background: white;
+    display: flex;
+    text-align: center;
+    justify-content: space-around;
+    align-items: center;
+}
+.joinwithus button{
+    background: black;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    height: 45px;
+    width: 130px;
+    border-radius: 50px;
+    font-weight: 500;
+    border-style: none;
+    
+}
+.joinwithus button:hover{
+    background-color: rgb(44, 44, 44);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.3s ease-in-out;
+}
+/* Footer */
+.footer {
+    background-color: rgb(46, 46, 46);
+    height: 400px;
+    font-family: "Anton", sans-serif;
+    font-size: large;
+    width: 100%;
+    
+}
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  

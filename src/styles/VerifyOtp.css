@@ -1,0 +1,128 @@
+
+.verify-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    padding: 0px 20px;
+  }
+  
+  .verify-content {
+    display: flex;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 100%;
+  }
+  
+  .verify-form {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .verify-form h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .verify-form p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .otp-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .otp-input {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 18px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .otp-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  .send-again {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  
+  .send-again:hover {
+    text-decoration: underline;
+  }
+  
+  .verify-button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+  }
+  
+  .verify-button:hover {
+    background-color: #333;
+  }
+  
+  .verify-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .verify-img-container {
+    flex: 1;
+    background: url('https://www.shutterstock.com/image-photo/crowd-partying-stage-lights-live-600nw-2297236461.jpg') no-repeat center center;
+    background-size: cover;
+    min-height: 400px;
+  }
+  
+  .logingohome {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  
+  .logingohome a {
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .logingohome i {
+    margin-right: 5px;
+  }
+  

@@ -1,0 +1,106 @@
+.hostlogin-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.hostlogin-left {
+    width: 45%;
+    background: #0F0F0F;
+    color: white;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hostlogintitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.hostloginbenefits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.hostloginbenefit-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.hostloginbenefit-item img {
+    width: 100px;
+    height: 100px;
+}
+
+.hostlogin-right {
+    width: 55%;
+    background: #F4F4F4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hostloginform-wrapper {
+    width: 500px;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.hostlogin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.hostlogin-form label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.hostlogin-form input {
+    width: 100%;
+    padding: 10px 0px;
+    padding-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.hostloginform-links {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    color: blue;
+}
+
+.hostlogin-btn {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.hostlogin-btn:hover {
+    background: #333;
+}
+
+.hostsignup-text {
+    margin-top: 15px;
+    font-size: 14px;
+}
