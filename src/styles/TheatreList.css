@@ -1,0 +1,112 @@
+/* General Layout */
+.theatre-list-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Logo Styling */
+.logo {
+  width: 180px;
+  margin-bottom: 2rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Date & Time Selection */
+.date-time-select {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.input-group,
+.time-selection {
+  margin-bottom: 1.5rem;
+}
+
+.select-input {
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  width: 50%;
+  max-width: 250px;
+  margin-top: 0.5rem;
+}
+
+/* Time Options */
+.time-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.time-btn {
+  padding: 10px 18px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.time-btn:hover {
+  background-color: #d0d0d0;
+}
+
+.time-btn.selected {
+  background-color: #ff4c4c;
+  color: white;
+  font-weight: bold;
+}
+
+/* Theatre Buttons */
+.theatre-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.theatre-btn {
+  background-color: #4a90e2;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  width: 60%;
+  max-width: 300px;
+}
+
+.theatre-btn:hover {
+  background-color: #357ab8;
+}
+
+/* Selection Summary */
+.selection-summary {
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  font-size: 16px;
+}

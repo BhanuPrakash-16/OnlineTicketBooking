@@ -461,15 +461,21 @@ body.popup-open {
     background: white;
     color: black;
     font-family: 'Poppins', sans-serif;
+     font-family: "Anton", sans-serif;
+    font-size: larger;
+    font-weight: 200;
     height: 45px;
     width: 140px;
     border: none;
+    border-radius: 30px;
 }
 
 .book-now-btn:hover {
     background: black;
     color: white;
     border: 2px solid white;
+    transform: 5s;
+    cursor: pointer;
 }
 
 .view-details-btn {

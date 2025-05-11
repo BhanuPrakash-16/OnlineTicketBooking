@@ -38,10 +38,7 @@ const UserLogin = () => {
       console.log("Login response:", response); // Debug log
       if (response.status === 200) {
         const userData = response.data;
-        if (userData.role !== "USER") {
-          setLoginError("This account is registered as a Host. Please use /host/login to log in.");
-          return;
-        }
+        
         // Store user data in localStorage
         localStorage.setItem("user", JSON.stringify(userData));
         alert("Login Successful");

@@ -10,47 +10,41 @@ const HostSignup = () => {
     email: "",
     password: "",
   });
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // In HostSignup.jsx (partial update to handleSubmit)
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!formData.phoneNumber) {
-    setError("Phone number is mandatory.");
-    return;
-  }
-  if (!formData.fullName || !formData.email || !formData.password) {
-    setError("All fields are required.");
-    return;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { fullName, phoneNumber, email, password } = formData;
 
-  try {
-    const response = await axios.post("http://localhost:7004/api/auth/send-otp", {
-      fullName: formData.fullName,
-      email: formData.email,
-      password: formData.password,
-      phoneNumber: formData.phoneNumber,
-      role: "HOST",
-    });
-    if (response.status === 200) {
-      // Store both email and role for OTP verification
-      localStorage.setItem("signupEmail", formData.email);
-      localStorage.setItem("signupRole", "HOST"); // Store role
-      navigate("/verify-otp");
+    if (!fullName || !phoneNumber || !email || !password) {
+      setError("All fields are required.");
+      return;
     }
-  } catch (error) {
-    console.error("Signup error:", error);
-    setError(
-      error.response?.data?.message || "An error occurred. Please try again."
-    );
-  }
-};
+
+    try {
+      const response = await axios.post("http://localhost:7004/api/host-auth/send-otp", {
+        fullName,
+        email,
+        password,
+        phoneNumber,
+      });
+
+      if (response.status === 200) {
+        localStorage.setItem("signupEmail", email);
+        navigate("/host/verify-otp");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      setError(error.response?.data?.message || "An error occurred. Please try again.");
+    }
+  };
 
   return (
     <div className="hostsignup-container">
@@ -60,30 +54,21 @@ const handleSubmit = async (e) => {
         <br />
         <div className="hostsignupbenefits-list">
           <div className="hostsignupbenefit-item">
-            <img
-              src="https://www.bigpartnership.co.uk/wp-content/uploads/2022/07/highlight-08.svg"
-              alt="Quick Registration"
-            />
+            <img src="https://www.bigpartnership.co.uk/wp-content/uploads/2022/07/highlight-08.svg" alt="Quick Registration" />
             <div>
               <h3>Quick Registration</h3>
               <p>Register effortlessly using your PAN card and bank details.</p>
             </div>
           </div>
           <div className="hostsignupbenefit-item">
-            <img
-              src="https://www.smartwires.com/wp-content/uploads/2024/04/SW-OG-47-1030x1030.png"
-              alt="Save Time"
-            />
+            <img src="https://www.smartwires.com/wp-content/uploads/2024/04/SW-OG-47-1030x1030.png" alt="Save Time" />
             <div>
               <h3>Save Time</h3>
               <p>Our streamlined process ensures a hassle-free experience.</p>
             </div>
           </div>
           <div className="hostsignupbenefit-item">
-            <img
-              src="https://marketdojo.com/wp-content/uploads/2024/03/Tranformational-Reporting.svg"
-              alt="Secure & Verified"
-            />
+            <img src="https://marketdojo.com/wp-content/uploads/2024/03/Tranformational-Reporting.svg" alt="Secure & Verified" />
             <div>
               <h3>Secure & Verified</h3>
               <p>We prioritize security with verified user authentication.</p>

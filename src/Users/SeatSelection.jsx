@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../styles/SeatSelection.css';
 
-const SeatSelection = () => {
+const SeatSelection = ({ showId, user }) => {
   const [rows, setRows] = useState(10);
   const [columns, setColumns] = useState(12);
   const [seats, setSeats] = useState([]);
@@ -11,32 +12,132 @@ const SeatSelection = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
+  const [error, setError] = useState('');
+  const [screenId, setScreenId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [seatClasses, setSeatClasses] = useState([
-    { name: "RECLINER", rows: 2, price: 450, color: "purple" },
-    { name: "FIRST CLASS", rows: 4, price: 300, color: "blue" },
-    { name: "BALCONY", rows: 4, price: 200, color: "teal" }
+    { name: 'RECLINER', rows: 2, price: 450, color: 'purple' },
+    { name: 'FIRST CLASS', rows: 4, price: 300, color: 'blue' },
+    { name: 'BALCONY', rows: 4, price: 200, color: 'teal' },
   ]);
 
   const [newSeatClass, setNewSeatClass] = useState({
-    name: "",
+    name: '',
     rows: 1,
     price: 100,
-    color: "emerald"
+    color: 'emerald',
   });
 
   const colorOptions = [
-    "red", "blue", "green", "yellow", "purple", "pink", "indigo", "teal",
-    "orange", "emerald", "cyan", "amber"
+    'red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo', 'teal',
+    'orange', 'emerald', 'cyan', 'amber',
   ];
+
+  const isHost = user && user.role === 'HOST';
 
   useEffect(() => {
     const totalRows = seatClasses.reduce((sum, cls) => sum + cls.rows, 0);
     setRows(totalRows);
-  }, [seatClasses]);
+    if (showId) {
+      fetchScreenAndSeats();
+    }
+  }, [seatClasses, showId]);
 
-  const generateSeats = () => {
+  const fetchScreenAndSeats = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch screen details for the show
+      const showRes = await axios.get(`/api/shows/${showId}`);
+      const screenId = showRes.data.screen_id;
+      setScreenId(screenId);
+
+      // Fetch screen configuration
+      const screenRes = await axios.get(`/api/screens/${screenId}`);
+      const { columns, seat_classes } = screenRes.data;
+      setColumns(columns);
+      setSeatClasses(seat_classes || seatClasses);
+
+      // Fetch seats
+      const seatsRes = await axios.get(`/api/screens/${screenId}/seats`);
+      const seats = seatsRes.data.map(seat => ({
+        id: seat.seat_id,
+        row: parseInt(seat.seat_number.match(/[A-Z]+/)[0].charCodeAt(0) - 65),
+        column: parseInt(seat.seat_number.match(/\d+/)[0]) - 1,
+        class: seat.class,
+        price: seat.price,
+        color: seatClasses.find(cls => cls.name === seat.class)?.color || 'teal',
+        status: seat.status,
+      }));
+
+      setSeats(seats);
+      setBlockedSeats(seats.filter(seat => seat.status === 'BLOCKED').map(seat => seat.id));
+      setDeletedSeats(seats.filter(seat => seat.status === 'DELETED').map(seat => seat.id));
+      setIsGenerated(true);
+
+      // Fetch booked seats for the show
+      const bookedRes = await axios.get(`/api/shows/${showId}/booked-seats`);
+      setBlockedSeats(prev => [
+        ...prev,
+        ...bookedRes.data.map(bs => bs.seat_id),
+      ]);
+    } catch (err) {
+      setError('Failed to load screen data');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const saveScreenAndSeats = async () => {
+    setIsLoading(true);
+    try {
+      // Save screen configuration
+      const screenData = {
+        screen_number: 1, // Adjust as needed
+        capacity: rows * columns - deletedSeats.length,
+        theater_id: 1, // Pass theater_id as prop or fetch from context
+        columns,
+        seat_classes: seatClasses,
+      };
+      
+      const screenRes = screenId 
+        ? await axios.put(`/api/screens/${screenId}`, screenData)
+        : await axios.post('/api/screens', screenData);
+      
+      const currentScreenId = screenRes.data.screen_id;
+      setScreenId(currentScreenId);
+
+      // Save seats
+      const seatData = seats.map(seat => ({
+        seat_id: seat.id,
+        seat_number: formatSeatLabel(seat.row, seat.column),
+        screen_id: currentScreenId,
+        class: seat.class,
+        price: seat.price,
+        status: deletedSeats.includes(seat.id)
+          ? 'DELETED'
+          : blockedSeats.includes(seat.id)
+          ? 'BLOCKED'
+          : 'AVAILABLE',
+      }));
+      
+      await axios.post(`/api/screens/${currentScreenId}/seats/batch`, seatData);
+    } catch (err) {
+      setError('Failed to save screen data');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateSeats = async () => {
     if (columns > 40) setColumns(40);
+    if (seatClasses.some(cls => !cls.name || cls.rows <= 0 || cls.price < 0)) {
+      setError('Invalid seat class configuration');
+      return;
+    }
+
     const newSeats = [];
     let rowCount = 0;
 
@@ -49,7 +150,8 @@ const SeatSelection = () => {
             column: j,
             class: seatClass.name,
             price: seatClass.price,
-            color: seatClass.color
+            color: seatClass.color,
+            status: 'AVAILABLE',
           });
         }
         rowCount++;
@@ -63,8 +165,13 @@ const SeatSelection = () => {
     setIsGenerated(true);
     setIsEditMode(false);
     setIsDeleteMode(false);
+    
+    try {
+      await saveScreenAndSeats();
+    } catch (err) {
+      setError('Failed to generate seats');
+    }
   };
-
   const addSeatClass = () => {
     if (newSeatClass.name && newSeatClass.rows > 0 && newSeatClass.price >= 0) {
       setSeatClasses([...seatClasses, { ...newSeatClass }]);

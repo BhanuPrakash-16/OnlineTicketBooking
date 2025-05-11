@@ -8,50 +8,54 @@ const HostLogin = () => {
     email: "",
     password: "",
   });
+
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
-      setError("Email and password are required.");
+    setError("");
+
+    const { email, password } = formData;
+
+    if (!email || !password) {
+      setError("Both email and password are required.");
       return;
     }
 
     setIsSubmitting(true);
+
     try {
-      console.log("Attempting host login with:", formData); // Debug log
-      const response = await axios.post("http://localhost:7004/api/auth/login", {
-        email: formData.email,
-        password: formData.password,
+      const response = await axios.post("http://localhost:7004/api/host-auth/login", {
+        email,
+        password,
       });
-      console.log("Host login response:", response); // Debug log
+
       if (response.status === 200) {
-        const userData = response.data;
-        if (userData.role !== "HOST") {
-          setError("This account is registered as a User. Please use /login to log in.");
-          return;
-        }
-        // Store user data in localStorage with role
-        localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/host/dashboard"); // Redirect to host dashboard
+        const hostData = response.data;
+        localStorage.setItem("user", JSON.stringify(hostData));
+        navigate("/host/dashboard");
       }
-    } catch (error) {
-      console.error("Host login error:", error); // Debug log
-      if (error.response) {
-        if (error.response.status === 401) {
+    } catch (err) {
+      console.error("Host login error:", err);
+      if (err.response) {
+        const status = err.response.status;
+        if (status === 401) {
           setError("Invalid email or password, or account not verified.");
         } else {
-          setError("An error occurred. Please try again.");
+          setError(err.response.data.message || "Login failed. Please try again.");
         }
       } else {
-        setError("Network error. Check your connection.");
+        setError("Network error. Please check your connection.");
       }
     } finally {
       setIsSubmitting(false);
@@ -63,7 +67,6 @@ const HostLogin = () => {
       {/* Left Section */}
       <div className="hostlogin-left">
         <h1 className="hostlogintitle">Why Choose Our Event Management Tool?</h1>
-        <br />
         <div className="hostloginbenefits-list">
           <div className="hostloginbenefit-item">
             <img
@@ -105,8 +108,9 @@ const HostLogin = () => {
           <p>Sign in to manage your events with ease.</p>
 
           <form className="hostlogin-form" onSubmit={handleLogin}>
-            <label>Email Address</label>
+            <label htmlFor="email">Email Address</label>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -115,8 +119,9 @@ const HostLogin = () => {
               required
             />
 
-            <label>Password</label>
+            <label htmlFor="password">Password</label>
             <input
+              id="password"
               type="password"
               name="password"
               value={formData.password}
@@ -126,7 +131,7 @@ const HostLogin = () => {
             />
 
             <div className="hostloginform-links">
-              <Link to="/forgot-password">Forgot Password?</Link>
+              <Link to="/host/forgot-password">Forgot Password?</Link>
             </div>
 
             {error && <span className="error-message">{error}</span>}

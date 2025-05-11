@@ -19,7 +19,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import axios from "axios"; // For logout (optional API call)
+import axios from "axios";
 
 const Homepage = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -31,33 +31,50 @@ const Homepage = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track login state
-  const [username, setUsername] = useState(""); // Store username
-  const [dropdownOpen, setDropdownOpen] = useState(false); // Dropdown state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [movies, setMovies] = useState([]);
+  const [error, setError] = useState("");
   const swiperRef = useRef(null);
   const videoRefs = useRef([]);
-  const OMDB_API_KEY = "fbf785d5";
   const moviesScrollRef = useRef(null);
   const concertsScrollRef = useRef(null);
   const sportsScrollRef = useRef(null);
   const eventsScrollRef = useRef(null);
   const navigate = useNavigate();
+  const OMDB_API_KEY = "fbf785d5";
 
-  // Simulate login state (replace with actual auth logic)
+  // Check authentication status
   useEffect(() => {
-    // Check if user is logged in (e.g., from localStorage or token)
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setIsAuthenticated(true);
-      setUsername(userData.fullName || "User"); // Assuming fullName from login response
+      setUsername(userData.fullName || "User");
     }
+  }, []);
+
+  // Fetch movies from backend
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:7004/api/movies");
+        setMovies(response.data);
+      } catch (err) {
+        setError("Failed to fetch movies. Please try again later.");
+        console.error("Error fetching movies:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMovies();
   }, []);
 
   const scrollNext = (scrollRef) => {
     if (scrollRef.current) {
-      const cardWidth = scrollRef.current.querySelector(".movieimagecontainer")
-        .offsetWidth;
+      const cardWidth = scrollRef.current.querySelector(".movieimagecontainer")?.offsetWidth || 200;
       scrollRef.current.scrollBy({
         left: cardWidth + 20,
         behavior: "smooth",
@@ -72,9 +89,7 @@ const Homepage = () => {
         `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${query}`
       );
       const data = await response.json();
-
       if (data.Response === "False") return [];
-
       const movies = data.Search
         .filter((movie) => movie.Poster !== "N/A" && movie.Poster !== "")
         .map((movie) => ({
@@ -84,7 +99,6 @@ const Homepage = () => {
           year: parseInt(movie.Year, 10),
         }))
         .sort((a, b) => b.year - a.year);
-
       return new Promise((resolve) => setTimeout(() => resolve(movies), 0));
     } catch (error) {
       console.error("OMDb API Error:", error);
@@ -99,32 +113,13 @@ const Homepage = () => {
       setResults([]);
       return;
     }
-
     const fetchResults = async () => {
       const omdbResults = await fetchFromOMDb(query);
       setResults(omdbResults);
     };
-
     const debounceTimeout = setTimeout(fetchResults, 500);
     return () => clearTimeout(debounceTimeout);
   }, [query]);
-
-  const movies = [
-    { name: "Avatar", img: "/images/Avatar-2.jpg", video: AvatarClip },
-    {
-      name: "Captain America",
-      img: "https://pbs.twimg.com/media/GcBNWznaAAA1QaX?format=jpg&name=4096x4096",
-      video: CaptainAmericaClip,
-    },
-    {
-      name: "Sankranthiki Vastunam",
-      img: "https://assets-in.bmscdn.com/discovery-catalog/events/et00418119-kdgdppvtlg-landscape.jpg",
-    },
-    {
-      name: "Concert",
-      img: "https://assets-in.bmscdn.com/nmcms/events/banner/desktop/media-desktop-sunitha-upadrasta-womens-day-special-performance-0-2025-2-6-t-8-2-5.jpg",
-    },
-  ];
 
   const handleMouseEnter = (index) => {
     setHoveredIndex(index);
@@ -166,25 +161,35 @@ const Homepage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    // Clear authentication state
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:7004/api/auth/logout");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
     setIsAuthenticated(false);
     setUsername("");
-    localStorage.removeItem("user"); // Remove user data from storage
-    // Optional: Call backend logout endpoint if implemented
-     axios.post("http://localhost:7004/api/auth/logout").then(() => navigate("/"));
-    navigate("/"); // Redirect to homepage
+    localStorage.removeItem("user");
+    navigate("/login");
   };
+
+  // Carousel movies
+  const carouselMovies = [
+    { name: "Avatar", img: "/images/Avatar-2.jpg", video: AvatarClip, movieid: "tt1630029" },
+    {
+      name: "Captain America",
+      img: "https://pbs.twimg.com/media/GcBNWznaAAA1QaX?format=jpg&name=4096x4096",
+      video: CaptainAmericaClip,
+      movieid: "tt14513804",
+    },
+  ];
 
   return (
     <div className="homepagecontainer">
       <nav className={`homepageheader ${isScrolled ? "blur-header" : ""}`}>
         <div className="homepageheader-left">
           <div className="logo">LOGO</div>
-          <div
-            className="homepagesearchbox"
-            onClick={() => setShowPopup(true)}
-          >
+          <div className="homepagesearchbox" onClick={() => setShowPopup(true)}>
             <FontAwesomeIcon icon={faSearch} className="search-icon" />
             <input
               type="text"
@@ -193,7 +198,6 @@ const Homepage = () => {
               className="search-input-header"
             />
           </div>
-
           <div className="homepageheaderlist">
             <a href="#">Home</a>
             <div
@@ -206,18 +210,10 @@ const Homepage = () => {
               </a>
               {isOpen && (
                 <div className="dropdown-content">
-                  <p>
-                    <a href="#movies">Movies</a>
-                  </p>
-                  <p>
-                    <a href="#concerts">Concerts</a>
-                  </p>
-                  <p>
-                    <a href="#sports">Sports</a>
-                  </p>
-                  <p>
-                    <a href="#events">Events</a>
-                  </p>
+                  <p><a href="#movies">Movies</a></p>
+                  <p><a href="#concerts">Concerts</a></p>
+                  <p><a href="#sports">Sports</a></p>
+                  <p><a href="#events">Events</a></p>
                 </div>
               )}
             </div>
@@ -258,7 +254,7 @@ const Homepage = () => {
               <FontAwesomeIcon icon={faUserCircle} size="2x" />
               {dropdownOpen && (
                 <div className="dropdown-menu">
-                  <p>Welcome,<br/> {username}</p>
+                  <p>Welcome,<br /> {username}</p>
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
@@ -267,7 +263,6 @@ const Homepage = () => {
         </div>
       </nav>
 
-      {/* Popup Search Window */}
       {showPopup && (
         <div className="popup-overlay" onClick={() => setShowPopup(false)}>
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
@@ -305,14 +300,8 @@ const Homepage = () => {
                       key={movie.id}
                       className="result-item"
                     >
-                      <img
-                        src={movie.poster}
-                        alt={movie.title}
-                        className="result-poster"
-                      />
-                      <p className="result-title">
-                        <strong>{movie.title}</strong>
-                      </p>
+                      <img src={movie.poster} alt={movie.title} className="result-poster" />
+                      <p className="result-title"><strong>{movie.title}</strong></p>
                       <p className="result-year">{movie.year}</p>
                     </Link>
                   ))}
@@ -340,7 +329,7 @@ const Homepage = () => {
           loop={true}
           autoplay={{ delay: 5000, disableOnInteraction: false }}
         >
-          {movies.map((movie, index) => (
+          {carouselMovies.map((movie, index) => (
             <SwiperSlide key={index} className="carousel-slide">
               <div
                 className="imageposter"
@@ -350,9 +339,7 @@ const Homepage = () => {
                 <img
                   src={movie.img}
                   alt={`${movie.name} poster`}
-                  className={
-                    hoveredIndex === index && movie.video ? "hidden" : "visible"
-                  }
+                  className={hoveredIndex === index && movie.video ? "hidden" : "visible"}
                 />
                 {movie.video && (
                   <video
@@ -361,9 +348,7 @@ const Homepage = () => {
                     muted={isMuted}
                     loop
                     playsInline
-                    className={
-                      hoveredIndex === index ? "visible" : "hidden"
-                    }
+                    className={hoveredIndex === index ? "visible" : "hidden"}
                   />
                 )}
                 <div className="overlay"></div>
@@ -388,25 +373,18 @@ const Homepage = () => {
                       </div>
                     )}
                     <div className="contentimage-buttons">
-                      <Link to="/eventdetails">
+                      <Link to={`/eventdetails/${movie.movieid}`}>
                         <button className="book-now-btn">Book Now</button>
                       </Link>
-                      <Link to="/eventdetails" state={{ movie }}>
-                        <button className="view-details-btn">
-                          View Details
-                        </button>
+                      <Link to={`/eventdetails/${movie.movieid}`} state={{ movie }}>
+                        <button className="view-details-btn">View Details</button>
                       </Link>
                     </div>
                   </div>
                   <div className="contentonimage-right">
                     {movie.video && (
-                      <div
-                        className="mute-unmute-button"
-                        onClick={toggleMute}
-                      >
-                        <FontAwesomeIcon
-                          icon={isMuted ? faVolumeMute : faVolumeUp}
-                        />
+                      <div className="mute-unmute-button" onClick={toggleMute}>
+                        <FontAwesomeIcon icon={isMuted ? faVolumeMute : faVolumeUp} />
                       </div>
                     )}
                   </div>
@@ -425,56 +403,37 @@ const Homepage = () => {
           </button>
         </div>
         <div className="movie-scroll-container">
-          <div className="movie-scroll" ref={moviesScrollRef}>
-            <Link to={`http://localhost:5173/eventdetails/tt31226981`}>
-              <div className="movieimagecontainer">
-                <img
-                  src="https://m.media-amazon.com/images/M/MV5BZGFiMWU4OTAtOGY2MC00ZTIwLThlNmMtOTMwMDAyYjk5M2E3XkEyXkFqcGc@._V1_.jpg"
-                  alt="Sankaranthiki vastunam"
-                />
-              </div>
-            </Link>
-            <Link to={`http://localhost:5173/eventdetails/tt27957740`}>
-              <div className="movieimagecontainer">
-                <img
-                  src="https://m.media-amazon.com/images/M/MV5BOTFjYWUwOGEtZjhkNS00MmZhLWE3NTMtNzhlMTE3MDRjOWYzXkEyXkFqcGc@._V1_.jpg"
-                  alt="qwertyu"
-                />
-              </div>
-            </Link>
-            <Link to={`http://localhost:5173/eventdetails/tt29383379`}>
-              <div className="movieimagecontainer">
-                <img
-                  src="https://m.media-amazon.com/images/M/MV5BMDNkZmZlOWEtMjIxYS00MzMwLTg4ODYtMDRmNzY2NjY3NDdkXkEyXkFqcGc@._V1_SX300.jpg"
-                  alt="marco"
-                />
-              </div>
-            </Link>
-            <Link to={`http://localhost:5173/eventdetails/tt14209618`}>
-              <div className="movieimagecontainer">
-                <img
-                  src="https://m.media-amazon.com/images/M/MV5BNTcwNDFkM2EtOWRjZS00Y2VjLTg0ZGEtMzJmN2ZlZjVkYjU1XkEyXkFqcGc@._V1_SX300.jpg"
-                  alt="movie"
-                />
-              </div>
-            </Link>
-            <Link to={`http://localhost:5173/eventdetails/tt16539454`}>
-              <div className="movieimagecontainer">
-                <img
-                  src="https://m.media-amazon.com/images/M/MV5BNWU1ZWFhNGQtZDhlZC00ZWFlLTlmNmEtN2VmYmZiN2Y5ZmQ2XkEyXkFqcGc@._V1_SX300.jpg"
-                  alt="movie"
-                />
-              </div>
-            </Link>
-            <Link to={`http://localhost:5173/eventdetails/tt16539454`}>
-              <div className="movieimagecontainer">
-                <img
-                  src="https://m.media-amazon.com/images/M/MV5BNWU1ZWFhNGQtZDhlZC00ZWFlLTlmNmEtN2VmYmZiN2Y5ZmQ2XkEyXkFqcGc@._V1_SX300.jpg"
-                  alt="movie"
-                />
-              </div>
-            </Link>
-          </div>
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          {loading ? (
+            <div className="movie-scroll" ref={moviesScrollRef}>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="movieimagecontainer">
+                  <Skeleton height={400} width={250} />
+                </div>
+              ))}
+            </div>
+          ) : movies.length > 0 ? (
+            <div className="movie-scroll" ref={moviesScrollRef}>
+              {movies.map((movie) => (
+                <Link
+                  to={`/eventdetail/${movie.imdbId}`}
+                  state={{ movie }}
+                  key={movie.imdbId}
+                >
+                  <div className="movieimagecontainer">
+                    <img
+                      src={movie.posterUrl}
+                      alt={movie.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <h2>{movie.title}</h2>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">No movies available.</p>
+          )}
         </div>
       </div>
 
@@ -494,10 +453,7 @@ const Homepage = () => {
               />
             </div>
             <div className="movieimagecontainer">
-              <img
-                src="https://in.bmscdn.com/events/moviecard/ET00430112.jpg"
-                alt="concert"
-              />
+              <img src="https://in.bmscdn.com/events/moviecard/ET00430112.jpg" alt="concert" />
             </div>
             <div className="movieimagecontainer">
               <img
@@ -555,10 +511,7 @@ const Homepage = () => {
               />
             </div>
             <div className="movieimagecontainer">
-              <img
-                src="https://in.bmscdn.com/events/moviecard/ET00428227.jpg"
-                alt="sports"
-              />
+              <img src="https://in.bmscdn.com/events/moviecard/ET00428227.jpg" alt="sports" />
             </div>
             <div className="movieimagecontainer">
               <img
@@ -587,7 +540,7 @@ const Homepage = () => {
           <div className="movie-scroll" ref={eventsScrollRef}>
             <div className="movieimagecontainer">
               <img
-                src="https://assets-in.bmscdn.com/discovery-catalog/events/tr:w-400,h-600,bg-CCCCCC/et00368435-fndtlqstcm-portrait.jpg"
+                src="https://media.istockphoto.com/id/1309885670/vector/summer-camp-poster-child-journey-camping-comic-style-flyer-school-kids-vacation-ad-brochure.jpg?s=612x612&w=0&k=20&c=h3ZiqmDlXTjvem0y90sUr30QJl14gTeM23GquxlS2aI="
                 alt="event"
               />
             </div>
@@ -610,16 +563,10 @@ const Homepage = () => {
               />
             </div>
             <div className="movieimagecontainer">
-              <img
-                src="https://in.bmscdn.com/events/moviecard/ET00414194.jpg"
-                alt="event"
-              />
+              <img src="https://in.bmscdn.com/events/moviecard/ET00414194.jpg" alt="event" />
             </div>
             <div className="movieimagecontainer">
-              <img
-                src="https://in.bmscdn.com/events/moviecard/ET00414194.jpg"
-                alt="event"
-              />
+              <img src="https://in.bmscdn.com/events/moviecard/ET00414194.jpg" alt="event" />
             </div>
           </div>
         </div>
@@ -629,7 +576,7 @@ const Homepage = () => {
         <div className="joinwithus">
           <h2>
             Got a show, event, activity or a great experience? Partner with us &
-            get listed on Logo{" "}
+            get listed on Logo
           </h2>
           <Link to="/host/login">
             <button>Contact Now</button>
